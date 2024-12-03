@@ -1,15 +1,2 @@
-[package]
-name = "advent-of-code-24"
-version = "0.1.0"
-edition = "2021"
-
-
-[[bin]]
-name="day1"
-path = "src/day1.rs"
-
-[[bin]]
-name="day2"
-path = "src/day2.rs"
-
-[dependencies]
+[workspace]
+members = ["day1", "day2", "day3"]

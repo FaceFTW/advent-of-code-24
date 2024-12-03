@@ -1,3 +1,5 @@
+use std::{fs::File, io::Read};
+
 fn main() {
     let mut string = String::new();
     match File::open("day.txt") {
@@ -13,20 +15,10 @@ fn main() {
     part2();
 }
 
-fn parse_data(string: &str) -> Vec<> {
-    string
-        .trim_end()
-        .split("\n")
-        .map(|raw| {
-
-        })
-        .collect()
+fn parse_data(string: &str) -> Vec {
+    string.trim_end().split("\n").map(|raw| {}).collect()
 }
 
-fn part1(){
+fn part1() {}
 
-}
-
-fn part2(){
-
-}
+fn part2() {}
