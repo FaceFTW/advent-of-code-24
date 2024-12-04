@@ -12,7 +12,7 @@ fn main() {
     let data = parse_data(string.as_str());
 
     part1(data.as_slice());
-    part2();
+    part2(data.as_slice());
 }
 
 fn parse_data(string: &str) -> Vec<Vec<char>> {
@@ -32,9 +32,68 @@ fn part1(data: &[Vec<char>]) {
     println!("Day 4 Part 1 result: {final_result}");
 }
 
-fn part2() {
+fn part2(data: &[Vec<char>]) {
+    let mut final_result = 0;
 
-    // println!("Day 4 Part 2 result: {final_result}");
+    //This is so much easier after part one my god
+    for row_chunk in data.windows(3) {
+        //Assertion, row len is the same
+        let chunked_rows: Vec<Vec<&[char]>> = row_chunk
+            .into_iter()
+            .map(|row| row.windows(3).collect())
+            .collect();
+        //quite a bit of "indirection" here
+        // first idx is the row
+        // second idx is the "chunk" in the rows
+        // third is the idx in the chunk
+        // dbg!(&chunked_rows);
+        for idx in 0..chunked_rows[0].len() {
+            // check if 'A is in the center before checking corners'
+            if chunked_rows[1][idx][1] == 'A' {
+                if (chunked_rows[0][idx][0] == 'M'
+                    && chunked_rows[0][idx][2] == 'S'
+                    && chunked_rows[2][idx][0] == 'M'
+                    && chunked_rows[2][idx][2] == 'S')
+                    || (chunked_rows[0][idx][0] == 'S'
+                        && chunked_rows[0][idx][2] == 'M'
+                        && chunked_rows[2][idx][0] == 'S'
+                        && chunked_rows[2][idx][2] == 'M')
+                    || (chunked_rows[0][idx][0] == 'S'
+                        && chunked_rows[0][idx][2] == 'S'
+                        && chunked_rows[2][idx][0] == 'M'
+                        && chunked_rows[2][idx][2] == 'M')
+                    || (chunked_rows[0][idx][0] == 'M'
+                        && chunked_rows[0][idx][2] == 'M'
+                        && chunked_rows[2][idx][0] == 'S'
+                        && chunked_rows[2][idx][2] == 'S')
+                {
+                    final_result = final_result + 1;
+                }
+
+                // if (chunked_rows[0][idx][1] == 'M'
+                //     && chunked_rows[2][idx][1] == 'S'
+                //     && chunked_rows[1][idx][0] == 'M'
+                //     && chunked_rows[1][idx][2] == 'S')
+                //     || (chunked_rows[0][idx][1] == 'S'
+                //         && chunked_rows[2][idx][1] == 'M'
+                //         && chunked_rows[1][idx][0] == 'S'
+                //         && chunked_rows[1][idx][2] == 'M')
+                //     || (chunked_rows[0][idx][1] == 'M'
+                //         && chunked_rows[2][idx][1] == 'S'
+                //         && chunked_rows[1][idx][0] == 'S'
+                //         && chunked_rows[1][idx][2] == 'M')
+                //     || (chunked_rows[0][idx][1] == 'S'
+                //         && chunked_rows[2][idx][1] == 'M'
+                //         && chunked_rows[1][idx][0] == 'M'
+                //         && chunked_rows[1][idx][2] == 'S')
+                // {
+                //     final_result = final_result + 1;
+                // }
+            }
+        }
+    }
+
+    println!("Day 4 Part 2 result: {final_result}");
 }
 
 fn count_fwds_bkwds(data: &[Vec<char>]) -> u64 {
