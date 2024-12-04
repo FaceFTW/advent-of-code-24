@@ -37,7 +37,6 @@ fn part2() {
     // println!("Day 4 Part 2 result: {final_result}");
 }
 
-
 fn count_fwds_bkwds(data: &[Vec<char>]) -> u64 {
     let mut count: u64 = 0;
     for row in data {
@@ -85,29 +84,61 @@ fn count_diagonals(data: &[Vec<char>]) -> u64 {
         // first idx is the row
         // second idx is the "chunk" in the rows
         // third is the idx in the chunk
+        // dbg!(&chunked_rows);
         for idx in 0..chunked_rows[0].len() {
+            //Bugfix - multiple diagonals in one chunk so check one diagonal at a time
+            //shoutout https://www.reddit.com/r/adventofcode/comments/1h6otn5/2024_day_4_part_1_rust_i_cant_figure_out_if_im/
+
             //Forwards Diagonal
-            if (chunked_rows[0][idx][0] == 'X'
+            if chunked_rows[0][idx][0] == 'X'
                 && chunked_rows[1][idx][1] == 'M'
                 && chunked_rows[2][idx][2] == 'A'
-                && chunked_rows[3][idx][3] == 'S')
-                || (chunked_rows[0][idx][0] == 'S'
-                    && chunked_rows[1][idx][1] == 'A'
-                    && chunked_rows[2][idx][2] == 'M'
-                    && chunked_rows[3][idx][3] == 'X')
-                //backwards diagonal
-                || (chunked_rows[0][idx][3] == 'X'
-                    && chunked_rows[1][idx][2] == 'M'
-                    && chunked_rows[2][idx][1] == 'A'
-                    && chunked_rows[3][idx][0] == 'S')
-                || (chunked_rows[0][idx][3] == 'S'
-                    && chunked_rows[1][idx][2] == 'A'
-                    && chunked_rows[2][idx][1] == 'M'
-                    && chunked_rows[3][idx][0] == 'X')
+                && chunked_rows[3][idx][3] == 'S'
+            {
+                count = count + 1;
+            }
+            if chunked_rows[0][idx][0] == 'S'
+                && chunked_rows[1][idx][1] == 'A'
+                && chunked_rows[2][idx][2] == 'M'
+                && chunked_rows[3][idx][3] == 'X'
+            {
+                count = count + 1;
+            }
+
+            //backwards diagonal
+            if chunked_rows[0][idx][3] == 'X'
+                && chunked_rows[1][idx][2] == 'M'
+                && chunked_rows[2][idx][1] == 'A'
+                && chunked_rows[3][idx][0] == 'S'
+            {
+                count = count + 1
+            }
+            if chunked_rows[0][idx][3] == 'S'
+                && chunked_rows[1][idx][2] == 'A'
+                && chunked_rows[2][idx][1] == 'M'
+                && chunked_rows[3][idx][0] == 'X'
             {
                 count = count + 1;
             }
         }
     }
     count
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{count_diagonals, parse_data};
+
+    #[test]
+    fn check_diag_counting() {
+        let input = r"
+S..S
+.AA.
+.MM.
+X..X
+        ";
+
+        let data = parse_data(input);
+        assert_eq!(count_diagonals(data.as_slice()), 2);
+    }
 }
