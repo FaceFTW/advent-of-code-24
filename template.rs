@@ -27,5 +27,5 @@ fn part1() {
 
 fn part2() {
 
-    println!("Day  Part 1 result: {final_result}");
+    println!("Day  Part 2 result: {final_result}");
 }
