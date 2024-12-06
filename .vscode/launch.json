@@ -77,6 +77,23 @@
 			},
 			"args": [],
 			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'day6'",
+			"cargo": {
+				"args": [
+					"build",
+					"--package=day6"
+				],
+				"filter": {
+					"name": "day6",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
 		}
 	]
 }
