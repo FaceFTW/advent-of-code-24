@@ -81,14 +81,14 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Debug executable 'day6'",
+			"name": "Debug executable 'day7'",
 			"cargo": {
 				"args": [
 					"build",
-					"--package=day6"
+					"--package=day7"
 				],
 				"filter": {
-					"name": "day6",
+					"name": "day7",
 					"kind": "bin"
 				}
 			},
