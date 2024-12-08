@@ -12,6 +12,8 @@ enum MapState {
 struct Data {
     antenna_map: HashMap<Position, MapState>,
     freq_map: HashMap<char, Vec<Position>>,
+    max_row: usize,
+    max_col: usize,
 }
 
 fn main() {
@@ -26,12 +28,14 @@ fn main() {
     let data = parse_data(string.as_str());
 
     part1(&data);
-    part2();
+    part2(&data);
 }
 
 fn parse_data(string: &str) -> Data {
     let mut antenna_map = HashMap::new();
     let mut freq_map: HashMap<char, Vec<Position>> = HashMap::new();
+    let max_row = string.lines().count();
+    let max_col = string.lines().next().unwrap().chars().count();
 
     string
         .trim_end()
@@ -66,6 +70,8 @@ fn parse_data(string: &str) -> Data {
     Data {
         antenna_map,
         freq_map,
+        max_row,
+        max_col,
     }
 }
 
@@ -77,7 +83,7 @@ fn part1(data: &Data) {
         .freq_map
         .clone() //To lazy to figure out the ownership issues
         .into_iter()
-        .flat_map(|(_, positions)| calc_antinotes(positions.as_slice()))
+        .flat_map(|(_, positions)| calc_antinodes(positions.as_slice()))
         .filter(|antinode_pos| data.antenna_map.contains_key(antinode_pos))
         .filter(|pos| used.insert(*pos, ()).is_none())
         .count();
@@ -85,11 +91,30 @@ fn part1(data: &Data) {
     println!("Day  Part 1 result: {final_result}");
 }
 
-fn part2() {
-    // println!("Day  Part 2 result: {final_result}");
+fn part2(data: &Data) {
+    //For doing unique impl
+    let mut used: HashMap<Position, ()> = HashMap::new();
+    // let max_row = data.antenna_map.len();
+    // let max_col = data.antenna_map[0].len();
+
+    let final_result = data
+        .freq_map
+        .clone() //To lazy to figure out the ownership issues
+        .into_iter()
+        .flat_map(|(_, positions)| {
+            calc_antinodes_v2(
+                positions.as_slice(),
+                data.max_row as isize,
+                data.max_col as isize,
+            )
+        })
+        .filter(|pos| used.insert(*pos, ()).is_none())
+        .count();
+
+    println!("Day  Part 1 result: {final_result}");
 }
 
-fn calc_antinotes(positions: &[Position]) -> Vec<Position> {
+fn calc_antinodes(positions: &[Position]) -> Vec<Position> {
     let mut antinodes = vec![];
     for i in 0..positions.len() {
         for j in (i + 1)..positions.len() {
@@ -98,6 +123,36 @@ fn calc_antinotes(positions: &[Position]) -> Vec<Position> {
             antinodes.push(Position(pos1.0 - dx, pos1.1 - dy));
             antinodes.push(Position(pos2.0 + dx, pos2.1 + dy));
         }
+    }
+    antinodes
+}
+
+fn calc_antinodes_v2(positions: &[Position], max_row: isize, max_col: isize) -> Vec<Position> {
+    let mut antinodes = vec![];
+    for i in 0..positions.len() {
+        for j in (i + 1)..positions.len() {
+            let (pos1, pos2) = (positions[i], positions[j]);
+            let (dx, dy) = (pos2.0 - pos1.0, pos2.1 - pos1.1);
+            antinodes.extend(get_antinodes_in_range(&pos1, -dx, -dy, max_row, max_col));
+            antinodes.extend(get_antinodes_in_range(&pos2, dx, dy, max_row, max_col));
+        }
+    }
+    antinodes
+}
+
+fn get_antinodes_in_range(
+    pos: &Position,
+    delta_row: isize,
+    delta_col: isize,
+    max_row: isize,
+    max_col: isize,
+) -> Vec<Position> {
+    let mut antinodes = vec![];
+    let (mut x, mut y) = (pos.0, pos.1);
+    while x >= 0 && y >= 0 && x < max_row && y < max_col {
+        antinodes.push(Position(x, y));
+        x += delta_row;
+        y += delta_col;
     }
     antinodes
 }
