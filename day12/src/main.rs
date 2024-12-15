@@ -12,7 +12,7 @@ fn main() {
     let data = parse_data(string.as_str());
 
     part1(&data);
-    part2();
+    part2(&data);
 }
 
 fn parse_data(string: &str) -> Vec<Vec<char>> {
@@ -76,6 +76,80 @@ impl Plot {
         }
         perimeter
     }
+
+    pub fn count_corners(&self) -> u64 {
+        //clone the vec but cast to isize for convenience
+        let spaces_isize: Vec<(isize, isize)> = self
+            .spaces
+            .iter()
+            .map(|e| (e.0 as isize, e.1 as isize))
+            .collect();
+        let mut corners = 0;
+        for (row, col) in &spaces_isize {
+            //outer corner checks
+            //ul
+            if !spaces_isize.contains(&(row - 1, *col))
+                && !spaces_isize.contains(&(row - 1, col - 1))
+                && !spaces_isize.contains(&(*row, col - 1))
+            {
+                corners += 1;
+            }
+            //ur
+            if !spaces_isize.contains(&(row - 1, *col))
+                && !spaces_isize.contains(&(row - 1, col + 1))
+                && !spaces_isize.contains(&(*row, col + 1))
+            {
+                corners += 1;
+            }
+            //dr
+            if !spaces_isize.contains(&(*row, col + 1))
+                && !spaces_isize.contains(&(row + 1, col + 1))
+                && !spaces_isize.contains(&(row + 1, *col))
+            {
+                corners += 1;
+            }
+            //dl
+            if !spaces_isize.contains(&(row + 1, *col))
+                && !spaces_isize.contains(&(row + 1, col - 1))
+                && !spaces_isize.contains(&(*row, col - 1))
+            {
+                corners += 1;
+            }
+
+            //inner corner checks
+            //ul-inner
+            if !spaces_isize.contains(&(*row, col - 1))
+                && spaces_isize.contains(&(row - 1, col - 1))
+            {
+                corners += 1;
+            }
+            //ur-inner
+            if !spaces_isize.contains(&(*row, col + 1))
+                && spaces_isize.contains(&(row - 1, col + 1))
+            {
+                corners += 1;
+            }
+            //dr-inner
+            if !spaces_isize.contains(&(*row, col + 1))
+                && spaces_isize.contains(&(row + 1, col + 1))
+            {
+                corners += 1;
+            }
+            //dl-inner
+            if !spaces_isize.contains(&(*row, col - 1))
+                && spaces_isize.contains(&(row + 1, col - 1))
+            {
+                corners += 1;
+            }
+        }
+        corners
+    }
+
+    pub fn count_edges(&self) -> u64 {
+        //Eulers polyhedra formula V+F = E+2
+        // F=1 (2D), so reduces to V - 1 = E, but one off error intests?
+        self.count_corners()
+    }
 }
 
 fn floodfill(
@@ -112,8 +186,24 @@ fn floodfill(
     plot
 }
 
-fn part2() {
-    // println!("Day 12 Part 2 result: {final_result}");
+fn part2(data: &Vec<Vec<char>>) {
+    let mut plots = Vec::new();
+    let mut garden = data.clone();
+
+    for row in 0..garden.len() {
+        for col in 0..garden[0].len() {
+            if garden[row][col].is_uppercase() {
+                let target = garden[row][col].clone();
+                plots.push(floodfill(&mut garden, target, (row, col)));
+            }
+        }
+    }
+
+    let final_result = plots
+        .into_iter()
+        .fold(0, |acc, e| acc + (e.spaces.len() as u64 * e.count_edges()));
+
+    println!("Day 12 Part 2 result: {final_result}");
 }
 
 #[cfg(test)]
@@ -146,5 +236,28 @@ mod tests {
         assert_eq!(4, plot1.spaces.len());
         assert_eq!(10, plot1.calc_perimeter());
         assert_eq!(vec![(0, 0), (0, 1), (0, 2), (0, 3)], plot1.spaces);
+    }
+
+    #[test]
+    fn edge_count_e() {
+        let mut garden = parse_data("EEEEE\nEXXXX\nEEEEE\nEXXXX\nEEEEE");
+        let mut plots = Vec::new();
+
+        for row in 0..garden.len() {
+            for col in 0..garden[0].len() {
+                if garden[row][col].is_uppercase() {
+                    let target = garden[row][col].clone();
+                    plots.push(floodfill(&mut garden, target, (row, col)));
+                }
+            }
+        }
+
+        //Check everything has been assigned a plot
+        assert_eq!(3, plots.len());
+
+        let plot1 = &plots[0];
+        assert_eq!(17, plot1.spaces.len());
+        assert_eq!(12, plot1.count_corners());
+        assert_eq!(12, plot1.count_edges());
     }
 }
