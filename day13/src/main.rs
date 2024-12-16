@@ -32,6 +32,24 @@ impl ClawMachine {
             false => None, //Not a valid soln
         }
     }
+    pub fn solve_v2(&self) -> Option<i64> {
+        //same as normal but prize x,y + 10000000000000
+        let (ax, ay) = self.a_offsets;
+        let (bx, by) = self.b_offsets;
+        let (prize_x, prize_y) = (
+            self.prize_pos.0 + 10000000000000,
+            self.prize_pos.1 + 10000000000000,
+        );
+
+        let det = (ax * by) - (ay * bx);
+        let det_i = (prize_x * by) - (prize_y * bx);
+        let det_j = (prize_y * ax) - (prize_x * ay);
+
+        match det_i % det == 0 && det_j % det == 0 {
+            true => Some(3 * (det_i / det) + (det_j / det)),
+            false => None, //Not a valid soln
+        }
+    }
 }
 
 fn main() {
@@ -46,7 +64,7 @@ fn main() {
     let data = parse_data(string.as_str());
 
     part1(data.as_slice());
-    part2();
+    part2(data.as_slice());
 }
 
 fn parse_data(string: &str) -> Vec<ClawMachine> {
@@ -115,16 +133,22 @@ fn parse_data(string: &str) -> Vec<ClawMachine> {
 }
 
 fn part1(data: &[ClawMachine]) {
-    let final_result = data.into_iter().fold(0, |acc, machine|{
-        match machine.solve(){
+    let final_result = data
+        .into_iter()
+        .fold(0, |acc, machine| match machine.solve() {
             Some(tokens) => acc + tokens,
             None => acc,
-        }
-    });
+        });
 
     println!("Day 13 Part 1 result: {final_result}");
 }
 
-fn part2() {
-    // println!("Day  Part 2 result: {final_result}");
+fn part2(data: &[ClawMachine]) {
+    let final_result = data
+        .into_iter()
+        .fold(0, |acc, machine| match machine.solve_v2() {
+            Some(tokens) => acc + tokens,
+            None => acc,
+        });
+    println!("Day 13 Part 2 result: {final_result}");
 }
