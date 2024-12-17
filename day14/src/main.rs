@@ -89,7 +89,7 @@ fn part1(data: &Vec<Robot>) {
 //interactive brute force
 fn part2(data: &Vec<Robot>) {
     let mut local_data = data.clone().to_owned();
-    let mut iter_count = 0;
+    let mut iter_count = 1;
     //Simulate robots
     loop {
         let mut stdinput = String::new();
